@@ -1,5 +1,7 @@
-import BreadcrumbShop from "@/components/shop-page/BreadcrumbShop";
+"use client";
 
+import { useEffect, useState } from "react";
+import BreadcrumbShop from "@/components/shop-page/BreadcrumbShop";
 import {
   Select,
   SelectContent,
@@ -10,7 +12,6 @@ import {
 import MobileFilters from "@/components/shop-page/filters/MobileFilters";
 import Filters from "@/components/shop-page/filters";
 import { FiSliders } from "react-icons/fi";
-import { newArrivalsData, relatedProductData, topSellingData } from "../page";
 import ProductCard from "@/components/common/ProductCard";
 import {
   Pagination,
@@ -21,8 +22,22 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
+import { fetchProducts } from "@/lib/features/products/productsApiSlice";
 
 export default function ShopPage() {
+  const dispatch = useAppDispatch();
+  const { products, isLoading, meta } = useAppSelector((state) => state.productsApi);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    dispatch(fetchProducts({ page: currentPage, pageSize: 12 }));
+  }, [dispatch, currentPage]);
+
+  const totalPages = meta ? Math.ceil(meta.total / meta.pageSize) : 1;
+  const startItem = meta ? (meta.page - 1) * meta.pageSize + 1 : 0;
+  const endItem = meta ? Math.min(meta.page * meta.pageSize, meta.total) : 0;
+
   return (
     <main className="pb-20">
       <div className="max-w-frame mx-auto px-4 xl:px-0">
@@ -39,12 +54,12 @@ export default function ShopPage() {
           <div className="flex flex-col w-full space-y-5">
             <div className="flex flex-col lg:flex-row lg:justify-between">
               <div className="flex items-center justify-between">
-                <h1 className="font-bold text-2xl md:text-[32px]">Casual</h1>
+                <h1 className="font-bold text-2xl md:text-[32px]">Productos</h1>
                 <MobileFilters />
               </div>
               <div className="flex flex-col sm:items-center sm:flex-row">
                 <span className="text-sm md:text-base text-black/60 mr-3">
-                  Showing 1-10 of 100 Products
+                  {meta ? `Showing ${startItem}-${endItem} of ${meta.total} Products` : "Loading..."}
                 </span>
                 <div className="flex items-center">
                   Sort by:{" "}
@@ -61,75 +76,66 @@ export default function ShopPage() {
                 </div>
               </div>
             </div>
-            <div className="w-full grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-              {[
-                ...relatedProductData.slice(1, 4),
-                ...newArrivalsData.slice(1, 4),
-                ...topSellingData.slice(1, 4),
-              ].map((product) => (
-                <ProductCard key={product.id} data={product} />
-              ))}
-            </div>
-            <hr className="border-t-black/10" />
-            <Pagination className="justify-between">
-              <PaginationPrevious href="#" className="border border-black/10" />
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    className="text-black/50 font-medium text-sm"
-                    isActive
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    className="text-black/50 font-medium text-sm"
-                  >
-                    2
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem className="hidden lg:block">
-                  <PaginationLink
-                    href="#"
-                    className="text-black/50 font-medium text-sm"
-                  >
-                    3
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis className="text-black/50 font-medium text-sm" />
-                </PaginationItem>
-                <PaginationItem className="hidden lg:block">
-                  <PaginationLink
-                    href="#"
-                    className="text-black/50 font-medium text-sm"
-                  >
-                    8
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem className="hidden sm:block">
-                  <PaginationLink
-                    href="#"
-                    className="text-black/50 font-medium text-sm"
-                  >
-                    9
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    className="text-black/50 font-medium text-sm"
-                  >
-                    10
-                  </PaginationLink>
-                </PaginationItem>
-              </PaginationContent>
-
-              <PaginationNext href="#" className="border border-black/10" />
-            </Pagination>
+            {isLoading ? (
+              <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+                  <p className="text-gray-600">Cargando productos...</p>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+                {products.map((product) => (
+                  <ProductCard key={product.id} data={product} />
+                ))}
+              </div>
+            )}
+            {products.length > 0 && (
+              <>
+                <hr className="border-t-black/10" />
+                <Pagination className="justify-between">
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    className={`border border-black/10 ${currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
+                  />
+                  <PaginationContent>
+                    {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => {
+                      const page = i + 1;
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            className="text-black/50 font-medium text-sm cursor-pointer"
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}
+                    {totalPages > 10 && (
+                      <>
+                        <PaginationItem>
+                          <PaginationEllipsis className="text-black/50 font-medium text-sm" />
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(totalPages)}
+                            className="text-black/50 font-medium text-sm cursor-pointer"
+                          >
+                            {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      </>
+                    )}
+                  </PaginationContent>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    className={`border border-black/10 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
+                  />
+                </Pagination>
+              </>
+            )}
           </div>
         </div>
       </div>

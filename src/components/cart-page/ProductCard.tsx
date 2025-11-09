@@ -20,29 +20,38 @@ type ProductCardProps = {
 
 const ProductCard = ({ data }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  
+  if (!data || !data.id) {
+    return null;
+  }
+  
+  const productSlug = data.name && typeof data.name === 'string' 
+    ? data.name.toLowerCase().replace(/\s+/g, "-") 
+    : "producto";
+  const productUrl = `/shop/product/${data.id}/${productSlug}`;
 
   return (
     <div className="flex items-start space-x-4">
       <Link
-        href={`/shop/product/${data.id}/${data.name.split(" ").join("-")}`}
+        href={productUrl}
         className="bg-[#F0EEED] rounded-lg w-full min-w-[100px] max-w-[100px] sm:max-w-[124px] aspect-square overflow-hidden"
       >
         <Image
-          src={data.srcUrl}
+          src={data.srcUrl || "/placeholder.svg"}
           width={124}
           height={124}
           className="rounded-md w-full h-full object-cover hover:scale-110 transition-all duration-500"
-          alt={data.name}
+          alt={data.name || "Producto"}
           priority
         />
       </Link>
       <div className="flex w-full self-stretch flex-col">
         <div className="flex items-center justify-between">
           <Link
-            href={`/shop/product/${data.id}/${data.name.split(" ").join("-")}`}
+            href={productUrl}
             className="text-black font-bold text-base xl:text-xl"
           >
-            {data.name}
+            {data.name || "Producto"}
           </Link>
           <Button
             variant="ghost"

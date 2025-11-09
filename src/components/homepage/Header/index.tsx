@@ -1,121 +1,155 @@
-import AnimatedCounter from "@/components/ui/AnimatedCounter";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { integralCF } from "@/styles/fonts";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
-import * as motion from "framer-motion/client";
+"use client"
 
-const Header = () => {
+import Image from "next/image"
+import type React from "react"
+
+import { useState, useEffect } from "react"
+
+interface Slide {
+  id: number
+  headline: string
+  description: string
+  image: string
+  ctaText: string
+}
+
+const slides: Slide[] = [
+  {
+    id: 1,
+    headline: "Fresh finds for every occasion",
+    description:
+      "Explore our latest arrivals, curated to bring you style, functionality, and inspiration. Shop now and discover your next favorite.",
+    image: "https://images.pexels.com/photos/210126/pexels-photo-210126.jpeg?_gl=1*vvnvbd*_ga*OTQ5NDc2NTk4LjE3NjI2NTQyNDI.*_ga_8JE65Q40S6*czE3NjI2NTc3NTckbzIkZzEkdDE3NjI2NTc3OTUkajIyJGwwJGgw",
+    ctaText: "Shop Now",
+  },
+  {
+    id: 2,
+    headline: "Elevate your space",
+    description: "Transform your home with our carefully selected collection of modern and elegant pieces.",
+    image: "https://images.pexels.com/photos/270637/pexels-photo-270637.jpeg?_gl=1*mnzw9t*_ga*OTQ5NDc2NTk4LjE3NjI2NTQyNDI.*_ga_8JE65Q40S6*czE3NjI2NTc3NTckbzIkZzEkdDE3NjI2NTc4ODMkajU4JGwwJGgw",
+    ctaText: "Explore Collection",
+  },
+  {
+    id: 3,
+    headline: "Design meets function",
+    description: "Discover products that blend beautiful design with practical functionality for your everyday life.",
+    image: "https://images.pexels.com/photos/383634/pexels-photo-383634.jpeg?_gl=1*zfnxnn*_ga*OTQ5NDc2NTk4LjE3NjI2NTQyNDI.*_ga_8JE65Q40S6*czE3NjI2NTc3NTckbzIkZzEkdDE3NjI2NTc5MDkkajMyJGwwJGgw",
+    ctaText: "Shop Now",
+  },
+]
+
+const HeroCarousel: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+
+  useEffect(() => {
+    if (!isAutoPlaying) return
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying])
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index)
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length)
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
+
   return (
-    <header className="bg-[#F2F0F1] pt-10 md:pt-24 overflow-hidden">
-      <div className="md:max-w-frame mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-        <section className="max-w-frame px-4">
-          <motion.h2
-            initial={{ y: "100px", opacity: 0, rotate: 10 }}
-            whileInView={{ y: "0", opacity: 1, rotate: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className={cn([
-              integralCF.className,
-              "text-4xl lg:text-[64px] lg:leading-[64px] mb-5 lg:mb-8",
-            ])}
+    <div className="relative w-full h-[600px] sm:h-[700px] lg:h-[800px] overflow-hidden bg-[#F5F1EB] dark:bg-neutral-900">
+      {/* Slides Container */}
+      <div className="relative w-full h-full">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
           >
-            FIND CLOTHES THAT MATCHES YOUR STYLE
-          </motion.h2>
-          <motion.p
-            initial={{ y: "100px", opacity: 0 }}
-            whileInView={{ y: "0", opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="text-black/60 text-sm lg:text-base mb-6 lg:mb-8 max-w-[545px]"
-          >
-            Browse through our diverse range of meticulously crafted garments,
-            designed to bring out your individuality and cater to your sense of
-            style.
-          </motion.p>
-          <motion.div
-            initial={{ y: "100px", opacity: 0 }}
-            whileInView={{ y: "0", opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 1, duration: 0.6 }}
-          >
-            <Link
-              href="/shop"
-              className="w-full md:w-52 mb-5 md:mb-12 inline-block text-center bg-black hover:bg-black/80 transition-all text-white px-14 py-4 rounded-full hover:animate-pulse"
-            >
-              Shop Now
-            </Link>
-          </motion.div>
-          <motion.div
-            initial={{ y: "100px", opacity: 0 }}
-            whileInView={{ y: "0", opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 1.5, duration: 0.6 }}
-            className="flex md:h-full md:max-h-11 lg:max-h-[52px] xl:max-h-[68px] items-center justify-center md:justify-start flex-wrap sm:flex-nowrap md:space-x-3 lg:space-x-6 xl:space-x-8 md:mb-[116px]"
-          >
-            <div className="flex flex-col">
-              <span className="font-bold text-2xl md:text-xl lg:text-3xl xl:text-[40px] xl:mb-2">
-                <AnimatedCounter from={0} to={200} />+
-              </span>
-              <span className="text-xs xl:text-base text-black/60 text-nowrap">
-                International Brands
-              </span>
-            </div>
-            <Separator
-              className="ml-6 md:ml-0 h-12 md:h-full bg-black/10"
-              orientation="vertical"
-            />
-            <div className="flex flex-col ml-6 md:ml-0">
-              <span className="font-bold text-2xl md:text-xl lg:text-3xl xl:text-[40px] xl:mb-2">
-                <AnimatedCounter from={0} to={2000} />+
-              </span>
-              <span className="text-xs xl:text-base text-black/60 text-nowrap">
-                High-Quality Products
-              </span>
-            </div>
-            <Separator
-              className="hidden sm:block sm:h-12 md:h-full ml-6 md:ml-0 bg-black/10"
-              orientation="vertical"
-            />
-            <div className="flex flex-col w-full text-center sm:w-auto sm:text-left mt-3 sm:mt-0 sm:ml-6 md:ml-0">
-              <span className="font-bold text-2xl md:text-xl lg:text-3xl xl:text-[40px] xl:mb-2">
-                <AnimatedCounter from={0} to={3000} />+
-              </span>
-              <span className="text-xs xl:text-base text-black/60 text-nowrap">
-                Happy Customers
-              </span>
-            </div>
-          </motion.div>
-        </section>
-        <motion.section
-          initial={{ y: "100px", opacity: 0, rotate: 10 }}
-          whileInView={{ y: "0", opacity: 1, rotate: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 2.3, duration: 0.8 }}
-          className="relative md:px-4 min-h-[448px] md:min-h-[428px] bg-cover bg-top xl:bg-[center_top_-1.6rem] bg-no-repeat bg-[url('/images/header-res-homepage.png')] md:bg-[url('/images/header-homepage.png')]"
-        >
-          <Image
-            priority
-            src="/icons/big-star.svg"
-            height={104}
-            width={104}
-            alt="big star"
-            className="absolute right-7 xl:right-0 top-12 max-w-[76px] max-h-[76px] lg:max-w-24 lg:max-h-max-w-24 xl:max-w-[104px] xl:max-h-[104px] animate-[spin_4s_infinite]"
-          />
-          <Image
-            priority
-            src="/icons/small-star.svg"
-            height={56}
-            width={56}
-            alt="small star"
-            className="absolute left-7 md:left-0 top-36 sm:top-64 md:top-44 lg:top-56 max-w-11 max-h-11 md:max-w-14 md:max-h-14 animate-[spin_3s_infinite]"
-          />
-        </motion.section>
-      </div>
-    </header>
-  );
-};
+            {/* Background with Image and Overlay */}
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0">
+                <Image
+                  src={slide.image || "/placeholder.svg"}
+                  alt={slide.headline}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+                {/* Subtle gradient overlay for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
+              </div>
 
-export default Header;
+              {/* Content - Left Side */}
+              <div className="relative z-10 h-full flex items-center px-6 sm:px-12 lg:px-20 xl:px-24">
+                <div className="max-w-2xl space-y-6 sm:space-y-8">
+                  {/* Headline - Serif Font */}
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-serif font-normal text-white leading-tight tracking-tight text-balance">
+                    {slide.headline}
+                  </h1>
+
+                  {/* Description - Sans-serif Font */}
+                  <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-xl leading-relaxed font-sans">
+                    {slide.description}
+                  </p>
+
+                  {/* CTA Button */}
+                  <button className="bg-white text-gray-900 px-8 py-3.5 rounded-full font-semibold text-sm sm:text-base hover:bg-gray-100 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-[1.02]">
+                    {slide.ctaText}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="absolute bottom-8 left-6 sm:left-12 lg:left-20 xl:left-24 flex gap-3 z-20">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`transition-all duration-500 ease-out ${
+              index === currentSlide
+                ? "w-12 h-0.5 bg-white rounded-full"
+                : "w-12 h-0.5 bg-white/40 rounded-full hover:bg-white/60"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+
+      <div className="absolute bottom-8 right-6 sm:right-12 lg:right-20 xl:right-24 flex items-center gap-4 text-white z-20">
+        <span className="text-sm font-medium tracking-wider">
+          {String(currentSlide + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+        </span>
+        <button
+          onClick={nextSlide}
+          className="w-10 h-10 flex items-center justify-center border border-white/60 hover:border-white hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
+          aria-label="Next slide"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6 4L10 8L6 12"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default HeroCarousel

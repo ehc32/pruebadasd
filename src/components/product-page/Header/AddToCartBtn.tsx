@@ -12,6 +12,9 @@ const AddToCartBtn = ({ data }: { data: Product & { quantity: number } }) => {
     (state: RootState) => state.products
   );
 
+  const mainImage = data.images && data.images.length > 0 ? data.images[0] : "/placeholder.svg";
+  const price = parseFloat(data.price);
+
   return (
     <button
       type="button"
@@ -20,11 +23,11 @@ const AddToCartBtn = ({ data }: { data: Product & { quantity: number } }) => {
         dispatch(
           addToCart({
             id: data.id,
-            name: data.title,
-            srcUrl: data.srcUrl,
-            price: data.price,
+            name: data.name,
+            srcUrl: mainImage,
+            price: price,
             attributes: [sizeSelection, colorSelection.name],
-            discount: data.discount,
+            discount: { amount: 0, percentage: 0 },
             quantity: data.quantity,
           })
         )

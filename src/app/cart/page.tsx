@@ -13,18 +13,22 @@ import React from "react";
 import { RootState } from "@/lib/store";
 import { useAppSelector } from "@/lib/hooks/redux";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CartPage() {
   const { cart, totalPrice, adjustedTotalPrice } = useAppSelector(
     (state: RootState) => state.carts
   );
 
+  const hasItems = !!cart && cart.items.length > 0;
+
   return (
     <main className="pb-20">
       <div className="max-w-frame mx-auto px-4 xl:px-0">
-        {cart && cart.items.length > 0 ? (
+        {hasItems ? (
           <>
             <BreadcrumbCart />
+
             <h2
               className={cn([
                 integralCF.className,
@@ -33,26 +37,30 @@ export default function CartPage() {
             >
               your cart
             </h2>
+
             <div className="flex flex-col lg:flex-row space-y-5 lg:space-y-0 lg:space-x-5 items-start">
+              {/* Lista de productos */}
               <div className="w-full p-3.5 md:px-6 flex-col space-y-4 md:space-y-6 rounded-[20px] border border-black/10">
-                {cart?.items.map((product, idx, arr) => (
+                {cart!.items.map((product, idx, arr) => (
                   <React.Fragment key={idx}>
                     <ProductCard data={product} />
-                    {arr.length - 1 !== idx && (
-                      <hr className="border-t-black/10" />
-                    )}
+                    {arr.length - 1 !== idx && <hr className="border-t-black/10" />}
                   </React.Fragment>
                 ))}
               </div>
+
+              {/* Resumen */}
               <div className="w-full lg:max-w-[505px] p-5 md:px-6 flex-col space-y-4 md:space-y-6 rounded-[20px] border border-black/10">
                 <h6 className="text-xl md:text-2xl font-bold text-black">
                   Order Summary
                 </h6>
+
                 <div className="flex flex-col space-y-5">
                   <div className="flex items-center justify-between">
                     <span className="md:text-xl text-black/60">Subtotal</span>
                     <span className="md:text-xl font-bold">${totalPrice}</span>
                   </div>
+
                   <div className="flex items-center justify-between">
                     <span className="md:text-xl text-black/60">
                       Discount (-
@@ -65,13 +73,14 @@ export default function CartPage() {
                       -${Math.round(totalPrice - adjustedTotalPrice)}
                     </span>
                   </div>
+
                   <div className="flex items-center justify-between">
-                    <span className="md:text-xl text-black/60">
-                      Delivery Fee
-                    </span>
+                    <span className="md:text-xl text-black/60">Delivery Fee</span>
                     <span className="md:text-xl font-bold">Free</span>
                   </div>
+
                   <hr className="border-t-black/10" />
+
                   <div className="flex items-center justify-between">
                     <span className="md:text-xl text-black">Total</span>
                     <span className="text-xl md:text-2xl font-bold">
@@ -79,6 +88,7 @@ export default function CartPage() {
                     </span>
                   </div>
                 </div>
+
                 <div className="flex space-x-3">
                   <InputGroup className="bg-[#F0F0F0]">
                     <InputGroup.Text>
@@ -98,6 +108,7 @@ export default function CartPage() {
                     Apply
                   </Button>
                 </div>
+
                 <Button
                   type="button"
                   className="text-sm md:text-base font-medium bg-black rounded-full w-full py-4 h-[54px] md:h-[60px] group"
@@ -109,10 +120,27 @@ export default function CartPage() {
             </div>
           </>
         ) : (
-          <div className="flex items-center flex-col text-gray-300 mt-32">
-            <TbBasketExclamation strokeWidth={1} className="text-6xl" />
-            <span className="block mb-4">Your shopping cart is empty.</span>
-            <Button className="rounded-full w-24" asChild>
+          /* ===== Estado vacío con imagen grande ===== */
+          <div className="flex flex-col items-center mt-24 text-center">
+            <div className="relative w-72 h-72 md:w-[560px] md:h-[560px]">
+              <Image
+                src="/undraw_shopping_app_flsj.png"
+                alt="Your cart is empty"
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 768px) 18rem, 560px"
+              />
+            </div>
+
+            <TbBasketExclamation
+              strokeWidth={1}
+              className="text-5xl text-gray-300 mt-6"
+            />
+            <span className="mt-2 mb-4 text-gray-500">
+              Your shopping cart is empty.
+            </span>
+            <Button className="rounded-full" asChild>
               <Link href="/shop">Shop</Link>
             </Button>
           </div>
