@@ -7,15 +7,25 @@ import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
 import { getMe, logout } from "@/lib/features/auth/authSlice";
 
+const menuItems = [
+  { label: "Mi perfil", href: "/profile" },
+  { label: "Mis pedidos", href: "/profile?section=orders" },
+  { label: "Favoritos", href: "/favorites" },
+];
+
 export default function ProfileDropdown() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, token, isLoading } = useAppSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Si hay token pero no hay usuario, cargar datos del usuario
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (token && !user && !isLoading) {
       dispatch(getMe());
     }
@@ -43,17 +53,26 @@ export default function ProfileDropdown() {
     router.push("/");
   };
 
-  // Mostrar link a login solo si no hay token
-  if (!token) {
+  if (!isMounted) {
+    return <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />;
+  }
+
+  const isLoggedIn = Boolean(token && isAuthenticated);
+
+  if (!isLoggedIn) {
     return (
-      <Link href="/login" className="p-1">
+      <Link
+        href="/login"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+        aria-label="Iniciar sesión"
+      >
         <Image
           priority
           src="/icons/user.svg"
-          height={100}
-          width={100}
+          height={32}
+          width={32}
           alt="user"
-          className="max-w-[22px] max-h-[22px]"
+          className="h-5 w-5"
         />
       </Link>
     );
@@ -62,41 +81,49 @@ export default function ProfileDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-1 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 rounded-full"
-        aria-label="Perfil"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/40 focus:ring-offset-2"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+        aria-label="Abrir menú de usuario"
+        type="button"
       >
         <Image
           priority
           src="/icons/user.svg"
-          height={100}
-          width={100}
+          height={32}
+          width={32}
           alt="user"
-          className="max-w-[22px] max-h-[22px]"
+          className="h-5 w-5"
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <p className="text-sm font-semibold text-gray-900">{user?.name || "Usuario"}</p>
-            <p className="text-xs text-gray-500 truncate">{user?.email || ""}</p>
+        <div className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-border/80 bg-background/95 shadow-xl backdrop-blur">
+          <div className="bg-muted/60 px-4 py-4">
+            <p className="text-sm font-semibold text-foreground">{user?.name || "Usuario"}</p>
+            <p className="text-xs text-muted-foreground">{user?.email || ""}</p>
           </div>
-
-          <Link
-            href="/profile"
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-          >
-            Mi perfil
-          </Link>
-
-          <button
-            onClick={handleLogout}
-            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors"
-          >
-            Cerrar sesión
-          </button>
+          <nav className="flex flex-col px-2 py-2 text-sm text-muted-foreground">
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className="rounded-lg px-3 py-2 font-medium transition-colors hover:bg-muted hover:text-foreground"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="border-t border-border/80 px-3 py-3">
+            <button
+              onClick={handleLogout}
+              className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-500 transition-colors hover:bg-rose-500/10"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </div>
       )}
     </div>

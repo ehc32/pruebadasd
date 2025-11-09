@@ -15,6 +15,7 @@ import ResTopNavbar from "./ResTopNavbar";
 import CartBtn from "./CartBtn";
 import ProfileDropdown from "./ProfileDropdown";
 import FavoritesBtn from "./FavoritesBtn";
+import ThemeToggle from "./ThemeToggle";
 
 const data: NavMenu = [
   {
@@ -73,65 +74,76 @@ const data: NavMenu = [
 
 const TopNavbar = () => {
   return (
-    <nav className="sticky top-0 bg-white z-20">
-      <div className="flex relative max-w-frame mx-auto items-center justify-between md:justify-start py-5 md:py-6 px-4 xl:px-0">
-        <div className="flex items-center">
-          <div className="block md:hidden mr-4">
+    <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-frame items-center justify-between gap-4 px-4 py-4 transition-colors md:gap-6 xl:px-0">
+        <div className="flex items-center gap-3 md:gap-6">
+          <div className="block md:hidden">
             <ResTopNavbar data={data} />
           </div>
           <Link
             href="/"
             className={cn([
               integralCF.className,
-              "text-2xl lg:text-[32px] mb-2 mr-3 lg:mr-10",
+              "text-2xl font-bold tracking-tight md:text-3xl",
             ])}
+            aria-label="Volver al inicio"
           >
             SHOP.CO
           </Link>
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList className="gap-1">
+              {data.map((item) => (
+                <React.Fragment key={item.id}>
+                  {item.type === "MenuItem" && (
+                    <MenuItem label={item.label} url={item.url} />
+                  )}
+                  {item.type === "MenuList" && (
+                    <MenuList data={item.children} label={item.label} />
+                  )}
+                </React.Fragment>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
-        <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
-          <NavigationMenuList>
-            {data.map((item) => (
-              <React.Fragment key={item.id}>
-                {item.type === "MenuItem" && (
-                  <MenuItem label={item.label} url={item.url} />
-                )}
-                {item.type === "MenuList" && (
-                  <MenuList data={item.children} label={item.label} />
-                )}
-              </React.Fragment>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-        <InputGroup className="hidden md:flex bg-[#F0F0F0] mr-3 lg:mr-10">
-          <InputGroup.Text>
-            <Image
-              priority
-              src="/icons/search.svg"
-              height={20}
-              width={20}
-              alt="search"
-              className="min-w-5 min-h-5"
-            />
-          </InputGroup.Text>
-          <InputGroup.Input
-            type="search"
-            name="search"
-            placeholder="Search for products..."
-            className="bg-transparent placeholder:text-black/40"
-          />
-        </InputGroup>
-        <div className="flex items-center">
-          <Link href="/search" className="block md:hidden mr-[14px] p-1">
+
+        <div className="flex flex-1 items-center justify-end gap-3 md:gap-4">
+          <div className="hidden flex-1 md:flex">
+            <InputGroup className="ml-auto w-full max-w-md items-center rounded-full border border-border/70 bg-muted/60 pr-4 text-sm shadow-sm">
+              <InputGroup.Text className="bg-transparent">
+                <Image
+                  priority
+                  src="/icons/search.svg"
+                  height={20}
+                  width={20}
+                  alt="search"
+                  className="min-h-5 min-w-5 text-muted-foreground"
+                />
+              </InputGroup.Text>
+              <InputGroup.Input
+                type="search"
+                name="search"
+                placeholder="Buscar productos, marcas o categorías"
+                className="w-full bg-transparent placeholder:text-muted-foreground focus:outline-none"
+              />
+            </InputGroup>
+          </div>
+
+          <Link
+            href="/search"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground md:hidden"
+            aria-label="Buscar"
+          >
             <Image
               priority
               src="/icons/search-black.svg"
-              height={100}
-              width={100}
-              alt="search"
-              className="max-w-[22px] max-h-[22px]"
+              height={20}
+              width={20}
+              alt="Buscar"
+              className="h-5 w-5"
             />
           </Link>
+
+          <ThemeToggle />
           <FavoritesBtn />
           <CartBtn />
           <ProfileDropdown />

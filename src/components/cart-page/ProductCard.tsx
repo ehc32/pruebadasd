@@ -70,18 +70,22 @@ const ProductCard = ({ data }: ProductCardProps) => {
             <PiTrashFill className="text-xl md:text-2xl text-red-600" />
           </Button>
         </div>
-        <div className="-mt-1">
-          <span className="text-black text-xs md:text-sm mr-1">Size:</span>
-          <span className="text-black/60 text-xs md:text-sm">
-            {data.attributes[0]}
-          </span>
-        </div>
-        <div className="mb-auto -mt-1.5">
-          <span className="text-black text-xs md:text-sm mr-1">Color:</span>
-          <span className="text-black/60 text-xs md:text-sm">
-            {data.attributes[1]}
-          </span>
-        </div>
+        {data.attributes?.length > 0 && (
+          <div className="-mt-1">
+            <span className="text-black text-xs md:text-sm mr-1">Size:</span>
+            <span className="text-black/60 text-xs md:text-sm">
+              {data.attributes[0] || "N/A"}
+            </span>
+          </div>
+        )}
+        {data.attributes?.length > 1 && (
+          <div className="mb-auto -mt-1.5">
+            <span className="text-black text-xs md:text-sm mr-1">Color:</span>
+            <span className="text-black/60 text-xs md:text-sm">
+              {data.attributes[1] || "N/A"}
+            </span>
+          </div>
+        )}
         <div className="flex items-center flex-wrap justify-between">
           <div className="flex items-center space-x-[5px] xl:space-x-2.5">
             {data.discount.percentage > 0 ? (

@@ -12,8 +12,15 @@ const AddToCartBtn = ({ data }: { data: Product & { quantity: number } }) => {
     (state: RootState) => state.products
   );
 
-  const mainImage = data.images && data.images.length > 0 ? data.images[0] : "/placeholder.svg";
+  const mainImage =
+    data.images && data.images.length > 0 ? data.images[0] : "/placeholder.svg";
   const price = parseFloat(data.price);
+  const sizeLabel =
+    typeof sizeSelection === "string" && sizeSelection.length > 0
+      ? sizeSelection
+      : data.unit?.name || "Standard";
+  const colorLabel =
+    colorSelection?.name || data.category?.name || "Default";
 
   return (
     <button
@@ -26,7 +33,7 @@ const AddToCartBtn = ({ data }: { data: Product & { quantity: number } }) => {
             name: data.name,
             srcUrl: mainImage,
             price: price,
-            attributes: [sizeSelection, colorSelection.name],
+            attributes: [sizeLabel, colorLabel],
             discount: { amount: 0, percentage: 0 },
             quantity: data.quantity,
           })
