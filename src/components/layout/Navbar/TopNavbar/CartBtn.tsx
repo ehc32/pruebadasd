@@ -10,18 +10,22 @@ const CartBtn = () => {
   const { cart } = useAppSelector((state: RootState) => state.carts);
 
   return (
-    <Link href="/cart" className="relative mr-[14px] p-1">
+    <Link
+      href="/cart"
+      className="relative mr-3 flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+      aria-label="Ver carrito"
+    >
       <Image
         priority
         src="/icons/cart.svg"
-        height={100}
-        width={100}
-        alt="cart"
-        className="max-w-[22px] max-h-[22px]"
+        height={24}
+        width={24}
+        alt="Cart"
+        className="h-5 w-5"
       />
       {cart && cart.totalQuantities > 0 && (
-        <span className="border bg-black text-white rounded-full w-fit-h-fit px-1 text-xs absolute -top-3 left-1/2 -translate-x-1/2">
-          {cart.totalQuantities}
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
+          {cart.totalQuantities > 9 ? "9+" : cart.totalQuantities}
         </span>
       )}
     </Link>

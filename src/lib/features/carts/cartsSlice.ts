@@ -18,12 +18,12 @@ const calcAdjustedTotalPrice = (
 };
 
 export type RemoveCartItem = {
-  id: number;
+  id: string;
   attributes: string[];
 };
 
 export type CartItem = {
-  id: number;
+  id: string;
   name: string;
   srcUrl: string;
   price: number;

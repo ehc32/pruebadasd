@@ -85,6 +85,7 @@ class ProductsAPI {
       const response = await fetch(`${this.baseURL}${endpoint}`, {
         ...options,
         headers,
+        cache: options.cache ?? "no-store",
       });
 
       if (!response.ok) {

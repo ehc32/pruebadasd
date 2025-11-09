@@ -1,18 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Provider } from "react-redux";
 import { makeStore } from "../lib/store";
 import { PersistGate } from "redux-persist/integration/react";
 import SpinnerbLoader from "@/components/ui/SpinnerbLoader";
 import AuthInitializer from "@/components/auth/AuthInitializer";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 type Props = {
   children: React.ReactNode;
 };
 
 const Providers = ({ children }: Props) => {
-  const { store, persistor } = makeStore();
+  const { store, persistor } = useMemo(() => makeStore(), []);
 
   return (
     <Provider store={store}>
@@ -24,8 +25,10 @@ const Providers = ({ children }: Props) => {
         }
         persistor={persistor}
       >
-        <AuthInitializer />
-        {children}
+        <ThemeProvider>
+          <AuthInitializer />
+          {children}
+        </ThemeProvider>
       </PersistGate>
     </Provider>
   );
